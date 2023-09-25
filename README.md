@@ -2,7 +2,7 @@
 
 A fork of the [BTC-price-ticker-V2_1-TTGO-T-Display](https://github.com/oxinon/BTC-price-ticker-V2_1-TTGO-T-Display) project, updated to work on the TTGO [T-Display-S3 AMOLED](https://www.lilygo.cc/products/t-display-s3-amoled) board.
 
-TODO: insert pic
+![T-Display-S3-AMOLED picture](/pictures/T-Display-S3-AMOLED-lilygo_10.webp)
 
 Before you begin, review and follow the instructions in <https://github.com/Xinyuan-LilyGO/T-Display-S3-AMOLED> to get the T-Display-S3 AMOLED board ready in the Arduino IDE. <b>The necesssary TFT_eSPI library is a pre-release so you won't find it in the Arduino IDE Library Manager. Please copy the contents of the /lib folder into Arduino/libraries. </b> 
 

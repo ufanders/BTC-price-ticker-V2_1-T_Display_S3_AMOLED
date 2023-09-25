@@ -16,6 +16,9 @@ git clone -b 6.x https://github.com/bblanchon/ArduinoJson.git
 #include "btclogo.h"
 #include "btc.h"
 
+#define TFT_AQUA  0x04FF
+#define TFT_GRAY  0x8410
+
 //---------------------------------------//
 
 // Edit this for your network
@@ -61,13 +64,14 @@ void setup()
     sprite.createSprite(536, 240);
     sprite.fillScreen(TFT_BLACK);
     
+    /*
     sprite.loadFont(NotoSansMonoSCB20);
     sprite.setTextDatum(TL_DATUM);  // Center the text
     sprite.setTextColor(TFT_GREEN);
     const int centerX = 170;
     const int centerY = 240 / 2;
     sprite.drawString("HELLO WORLD!", centerX, centerY, 2);
-
+    */
     // Push the sprite to the display
     lcd_PushColors(0, 0, 536, 240, (uint16_t *)sprite.getPointer());
     
@@ -114,7 +118,6 @@ void setup()
 
 void loop()
 {
-    /*
     unsigned long timeNow = millis();
     if ((timeNow > api_due_time))  {
         // int signal bars
@@ -152,10 +155,8 @@ void loop()
         printTickerData("BTC");
         api_due_time = timeNow + api_mtbs;
     }
-    */
 }
 
-/*
 void printTickerData(String ticker)
 {
     Serial.println("---------------------------------");
@@ -210,12 +211,10 @@ void printTickerData(String ticker)
 
         if (response.percent_change_1h < 0) {
             sprite.setTextColor(TFT_RED);
-            
         }
         
         if (response.percent_change_1h > 0) {
             sprite.setTextColor(TFT_GREEN);
-            
         }
 
         sprite.drawString(String(response.price).c_str(), 100, 37, 6);
@@ -224,7 +223,7 @@ void printTickerData(String ticker)
 
         sprite.drawString(String(response.cmc_rank).c_str(), 183, 80, 4);
 
-        sprite.drawLine(11, 106, 229, 106, TFT_GRAY);
+        sprite.drawLine(11, 106, TFT_WIDTH-11, 106, TFT_GRAY);
 
         // hours change
         sprite.fillRect(100, 110, 140, 25, TFT_BLACK);
@@ -238,6 +237,8 @@ void printTickerData(String ticker)
         }
         sprite.drawString("% Price 1h:", 11, 110, 4);
         sprite.drawString(String(response.percent_change_1h).c_str(), 156, 110, 4);
+        // Push the sprite to the display
+        lcd_PushColors(0, 0, 536, 240, (uint16_t *)sprite.getPointer());
         delay(90000);
 
         // 24 hours change
@@ -252,6 +253,8 @@ void printTickerData(String ticker)
         }
         sprite.drawString("% Price 24h:", 11, 110, 4);
         sprite.drawString(String(response.percent_change_24h).c_str(), 156, 110, 4);
+        // Push the sprite to the display
+        lcd_PushColors(0, 0, 536, 240, (uint16_t *)sprite.getPointer());
         delay(90000);
 
         // 7d hours change
@@ -266,6 +269,8 @@ void printTickerData(String ticker)
         }
         sprite.drawString("% Price 7d:", 11, 110, 4);
         sprite.drawString(String(response.percent_change_7d).c_str(), 156, 110, 4);
+        // Push the sprite to the display
+        lcd_PushColors(0, 0, 536, 240, (uint16_t *)sprite.getPointer());
         delay(90000);
     }
     else {
@@ -273,7 +278,9 @@ void printTickerData(String ticker)
         Serial.println(response.error);
         sprite.fillRect(200, 2, 40, 32, TFT_BLACK); //wifi RSSI and alert
         sprite.pushImage(203, 2, alertWidth, alertHeight, alert);
+        // Push the sprite to the display
+    lcd_PushColors(0, 0, 536, 240, (uint16_t *)sprite.getPointer());
     }
+
     Serial.println("---------------------------------");
 }
-*/
