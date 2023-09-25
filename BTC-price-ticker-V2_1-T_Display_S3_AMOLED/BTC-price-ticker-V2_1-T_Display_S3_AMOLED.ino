@@ -56,34 +56,38 @@ void setup()
 
     rm67162_init();
     lcd_setRotation(1);
-    sprite.createSprite(536, 240);
-    sprite.setTextDatum(MC_DATUM);  // Center the text
-    sprite.setTextColor(TFT_RED);
     sprite.setSwapBytes(1);
-    sprite.fillScreen(TFT_BLACK);
-    sprite.loadFont(NotoSansMonoSCB20);
 
+    sprite.createSprite(536, 240);
+    sprite.fillScreen(TFT_BLACK);
+    
+    sprite.loadFont(NotoSansMonoSCB20);
+    sprite.setTextDatum(TL_DATUM);  // Center the text
+    sprite.setTextColor(TFT_GREEN);
     const int centerX = 170;
     const int centerY = 240 / 2;
     sprite.drawString("HELLO WORLD!", centerX, centerY, 2);
 
     // Push the sprite to the display
     lcd_PushColors(0, 0, 536, 240, (uint16_t *)sprite.getPointer());
-
-    /*
+    
     uint16_t time = millis();
     time = millis() - time;
 
-    tft.pushImage(0, 0, btclogoWidth, btclogoHeight, btclogo);
+    sprite.pushImage(0, 0, btclogoWidth, btclogoHeight, btclogo);
+    // Push the sprite to the display
+    lcd_PushColors(0, 0, 536, 240, (uint16_t *)sprite.getPointer());
     delay(3000);
 
     // Startup
-    tft.fillScreen(TFT_BLACK);
+    sprite.fillScreen(TFT_BLACK);
     Serial.print("Connecting to ");
-    tft.drawString("Connecting to ", 15, 10, 2);;
+    sprite.drawString("Connecting to ", 15, 10, 2);;
     Serial.println(wifi_ssid);
-    tft.drawString(wifi_ssid, 15, 25, 2);
-    tft.pushImage(200, 2, infoWidth, infoHeight, info);
+    sprite.drawString(wifi_ssid, 15, 25, 2);
+    sprite.pushImage(200, 2, infoWidth, infoHeight, info);
+    // Push the sprite to the display
+    lcd_PushColors(0, 0, 536, 240, (uint16_t *)sprite.getPointer());
     delay(1000);
 
     WiFi.begin(wifi_ssid, wifi_password);
@@ -95,16 +99,17 @@ void setup()
 
     Serial.println("");
     Serial.println("WiFi connected");
-    tft.setTextColor(TFT_GREEN);
-    tft.drawString("WiFi connected", 15, 40, 2);
-    tft.setTextColor(TFT_WHITE);
+    sprite.setTextColor(TFT_GREEN);
+    sprite.drawString("WiFi connected", 15, 40, 2);
+    sprite.setTextColor(TFT_WHITE);
     Serial.println("IP address: ");
     Serial.println(WiFi.localIP());
     delay(1000);
-    tft.fillRect(0, 0, 240, 135, TFT_BLACK);
+    sprite.fillRect(0, 0, 240, 135, TFT_BLACK);
 
-    tft.pushImage(5, 15, btcWidth, btcHeight, btc);
-    */
+    sprite.pushImage(5, 15, btcWidth, btcHeight, btc);
+    // Push the sprite to the display
+    lcd_PushColors(0, 0, 536, 240, (uint16_t *)sprite.getPointer());
 }
 
 void loop()
@@ -115,7 +120,7 @@ void loop()
         // int signal bars
         Serial.print("WiFi Signal strength: ");
         Serial.print(WiFi.RSSI());
-        tft.fillRect(200, 2, 40, 32, TFT_BLACK); //wifi RSSI and alert
+        sprite.fillRect(200, 2, 40, 32, TFT_BLACK); //wifi RSSI and alert
 
         int bars;
         RSSI = WiFi.RSSI();
@@ -142,7 +147,7 @@ void loop()
 
         // signal bars
         for (int b = 0; b <= bars; b++) {
-            tft.fillRect(202 + (b * 6), 23 - (b * 4), 5, b * 4, TFT_GRAY);
+            sprite.fillRect(202 + (b * 6), 23 - (b * 4), 5, b * 4, TFT_GRAY);
         }
         printTickerData("BTC");
         api_due_time = timeNow + api_mtbs;
@@ -193,81 +198,81 @@ void printTickerData(String ticker)
         Serial.print("Last Updated: ");
         Serial.println(response.last_updated);
 
-        tft.setTextColor(TFT_GRAY);
-        tft.drawString("BTC USD Price", 100, 11, 2);
+        sprite.setTextColor(TFT_GRAY);
+        sprite.drawString("BTC USD Price", 100, 11, 2);
 
-        tft.setTextColor(TFT_WHITE);
+        sprite.setTextColor(TFT_WHITE);
 
-        tft.fillRect(117, 37, 123, 38, TFT_BLACK); //price
-        tft.fillRect(185, 80, 55, 20, TFT_BLACK); //rank
+        sprite.fillRect(117, 37, 123, 38, TFT_BLACK); //price
+        sprite.fillRect(185, 80, 55, 20, TFT_BLACK); //rank
 
-        tft.setTextColor(TFT_YELLOW);
+        sprite.setTextColor(TFT_YELLOW);
 
         if (response.percent_change_1h < 0) {
-            tft.setTextColor(TFT_RED);
+            sprite.setTextColor(TFT_RED);
             
         }
         
         if (response.percent_change_1h > 0) {
-            tft.setTextColor(TFT_GREEN);
+            sprite.setTextColor(TFT_GREEN);
             
         }
 
-        tft.drawString(String(response.price).c_str(), 100, 37, 6);
-        tft.setTextColor(TFT_AQUA);
-        tft.drawString("Rank:", 100, 80, 4);
+        sprite.drawString(String(response.price).c_str(), 100, 37, 6);
+        sprite.setTextColor(TFT_AQUA);
+        sprite.drawString("Rank:", 100, 80, 4);
 
-        tft.drawString(String(response.cmc_rank).c_str(), 183, 80, 4);
+        sprite.drawString(String(response.cmc_rank).c_str(), 183, 80, 4);
 
-        tft.drawLine(11, 106, 229, 106, TFT_GRAY);
+        sprite.drawLine(11, 106, 229, 106, TFT_GRAY);
 
         // hours change
-        tft.fillRect(100, 110, 140, 25, TFT_BLACK);
-        tft.setTextColor(TFT_YELLOW);
+        sprite.fillRect(100, 110, 140, 25, TFT_BLACK);
+        sprite.setTextColor(TFT_YELLOW);
 
         if (response.percent_change_1h < 0) {
-            tft.setTextColor(TFT_RED);
+            sprite.setTextColor(TFT_RED);
         }
         if (response.percent_change_1h > 0) {
-            tft.setTextColor(TFT_GREEN);
+            sprite.setTextColor(TFT_GREEN);
         }
-        tft.drawString("% Price 1h:", 11, 110, 4);
-        tft.drawString(String(response.percent_change_1h).c_str(), 156, 110, 4);
+        sprite.drawString("% Price 1h:", 11, 110, 4);
+        sprite.drawString(String(response.percent_change_1h).c_str(), 156, 110, 4);
         delay(90000);
 
         // 24 hours change
-        tft.fillRect(100, 110, 140, 25, TFT_BLACK);
-        tft.setTextColor(TFT_YELLOW);
+        sprite.fillRect(100, 110, 140, 25, TFT_BLACK);
+        sprite.setTextColor(TFT_YELLOW);
 
         if (response.percent_change_24h < 0) {
-            tft.setTextColor(TFT_RED);
+            sprite.setTextColor(TFT_RED);
         }
         if (response.percent_change_24h > 0) {
-            tft.setTextColor(TFT_GREEN);
+            sprite.setTextColor(TFT_GREEN);
         }
-        tft.drawString("% Price 24h:", 11, 110, 4);
-        tft.drawString(String(response.percent_change_24h).c_str(), 156, 110, 4);
+        sprite.drawString("% Price 24h:", 11, 110, 4);
+        sprite.drawString(String(response.percent_change_24h).c_str(), 156, 110, 4);
         delay(90000);
 
         // 7d hours change
-        tft.fillRect(100, 110, 140, 25, TFT_BLACK);
-        tft.setTextColor(TFT_YELLOW);
+        sprite.fillRect(100, 110, 140, 25, TFT_BLACK);
+        sprite.setTextColor(TFT_YELLOW);
 
         if (response.percent_change_7d < 0) {
-            tft.setTextColor(TFT_RED);
+            sprite.setTextColor(TFT_RED);
         }
         if (response.percent_change_7d > 0) {
-            tft.setTextColor(TFT_GREEN);
+            sprite.setTextColor(TFT_GREEN);
         }
-        tft.drawString("% Price 7d:", 11, 110, 4);
-        tft.drawString(String(response.percent_change_7d).c_str(), 156, 110, 4);
+        sprite.drawString("% Price 7d:", 11, 110, 4);
+        sprite.drawString(String(response.percent_change_7d).c_str(), 156, 110, 4);
         delay(90000);
     }
     else {
         Serial.print("Error getting data: ");
         Serial.println(response.error);
-        tft.fillRect(200, 2, 40, 32, TFT_BLACK); //wifi RSSI and alert
-        tft.pushImage(203, 2, alertWidth, alertHeight, alert);
+        sprite.fillRect(200, 2, 40, 32, TFT_BLACK); //wifi RSSI and alert
+        sprite.pushImage(203, 2, alertWidth, alertHeight, alert);
     }
     Serial.println("---------------------------------");
 }
