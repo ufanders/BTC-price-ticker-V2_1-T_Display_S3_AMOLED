@@ -127,7 +127,7 @@ void printTickerData(String ticker)
     //For the new API, you can use the currency ID or abbreviated name, such as
     //Bitcoin, you can view the letter after Circulating Supply at https://coinmarketcap.com/, it is BTC
 
-    CMCTickerResponse response = api.GetTickerInfo(ticker, "USD");
+    CMCTickerResponse response = api.update(ticker, "USD");
     if (response.error == "") {
         Serial.print("ID: ");
         Serial.println(response.id);
