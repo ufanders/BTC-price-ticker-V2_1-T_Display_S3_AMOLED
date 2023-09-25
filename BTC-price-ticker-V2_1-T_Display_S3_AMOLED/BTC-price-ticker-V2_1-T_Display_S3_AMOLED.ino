@@ -16,7 +16,6 @@ git clone -b 6.x https://github.com/bblanchon/ArduinoJson.git
 #include "btclogo.h"
 #include "btc.h"
 
-
 //---------------------------------------//
 
 // Edit this for your network
@@ -29,7 +28,6 @@ git clone -b 6.x https://github.com/bblanchon/ArduinoJson.git
 
 //---------------------------------------//
 
-
 WiFiClientSecure client;
 CoinMarketCapApi api(client, APIKEY);
 
@@ -37,34 +35,18 @@ CoinMarketCapApi api(client, APIKEY);
 // Make sure to factor in if you are requesting more than one coin.
 unsigned long api_mtbs = 60000; //mean time between api requests
 unsigned long api_due_time = 0;
-// SPI TFT settings edit UserSetup !!!
+
+#include "rm67162.h"
 #include <TFT_eSPI.h>
-#include <SPI.h>
+#include "NotoSansMonoSCB20.h"
+#include "Latin_Hiragana_24.h"
 
-#ifndef TFT_DISPOFF
-#define TFT_DISPOFF 0x28
-#endif
+// Initialize display and sprites
+TFT_eSPI tft = TFT_eSPI();
+TFT_eSprite bgr = TFT_eSprite(&tft);
+TFT_eSprite sprite = TFT_eSprite(&tft);
 
-#ifndef TFT_SLPIN
-#define TFT_SLPIN   0x10
-#endif
-
-#define TFT_MOSI        19
-#define TFT_SCLK        18
-#define TFT_CS          5
-#define TFT_DC          16
-#define TFT_RST         23
-
-#define TFT_BL          4  // Display backlight control pin
-#define ADC_EN          14
-#define ADC_PIN         34
-#define BUTTON_1        35
-#define BUTTON_2        0
-
-TFT_eSPI tft = TFT_eSPI(135, 240); 
-
-#define TFT_AQUA  0x04FF
-#define TFT_GRAY  0x8410
+float RSSI = 0.0;
 
 // begin setup
 void setup()
@@ -72,22 +54,30 @@ void setup()
     Serial.begin(115200);
     Serial.println(F("Boot Ticker"));
 
-    tft.setRotation(1);  //rotate 90 degree
-    tft.fillScreen(TFT_BLACK);
+    rm67162_init();
+    lcd_setRotation(1);
+    sprite.createSprite(536, 240);
+    sprite.setTextDatum(MC_DATUM);  // Center the text
+    sprite.setTextColor(TFT_RED);
+    sprite.setSwapBytes(1);
+    sprite.fillScreen(TFT_BLACK);
+    sprite.loadFont(NotoSansMonoSCB20);
 
-    pinMode(TFT_BL, OUTPUT);
-    digitalWrite(TFT_BL, HIGH);
+    const int centerX = 170;
+    const int centerY = 240 / 2;
+    sprite.drawString("HELLO WORLD!", centerX, centerY, 2);
 
+    // Push the sprite to the display
+    lcd_PushColors(0, 0, 536, 240, (uint16_t *)sprite.getPointer());
 
+    /*
     uint16_t time = millis();
     time = millis() - time;
-    tft.init();
-    tft.fillScreen(TFT_BLACK);
-    tft.setSwapBytes(true);
+
     tft.pushImage(0, 0, btclogoWidth, btclogoHeight, btclogo);
     delay(3000);
 
-    // Starup
+    // Startup
     tft.fillScreen(TFT_BLACK);
     Serial.print("Connecting to ");
     tft.drawString("Connecting to ", 15, 10, 2);;
@@ -114,15 +104,57 @@ void setup()
     tft.fillRect(0, 0, 240, 135, TFT_BLACK);
 
     tft.pushImage(5, 15, btcWidth, btcHeight, btc);
+    */
 }
 
+void loop()
+{
+    /*
+    unsigned long timeNow = millis();
+    if ((timeNow > api_due_time))  {
+        // int signal bars
+        Serial.print("WiFi Signal strength: ");
+        Serial.print(WiFi.RSSI());
+        tft.fillRect(200, 2, 40, 32, TFT_BLACK); //wifi RSSI and alert
 
+        int bars;
+        RSSI = WiFi.RSSI();
 
+        if (RSSI >= -55) {
+            bars = 5;
+            Serial.println(" 5 bars");
+        } else if (RSSI < -55 & RSSI >= -65) {
+            bars = 4;
+            Serial.println(" 4 bars");
+        } else if (RSSI < -65 & RSSI >= -70) {
+            bars = 3;
+            Serial.println(" 3 bars");
+        } else if (RSSI < -70 & RSSI >= -78) {
+            bars = 2;
+            Serial.println(" 2 bars");
+        } else if (RSSI < -78 & RSSI >= -82) {
+            bars = 1;
+            Serial.println(" 1 bars");
+        } else {
+            bars = 0;
+            Serial.println(" 0 bars");
+        }
+
+        // signal bars
+        for (int b = 0; b <= bars; b++) {
+            tft.fillRect(202 + (b * 6), 23 - (b * 4), 5, b * 4, TFT_GRAY);
+        }
+        printTickerData("BTC");
+        api_due_time = timeNow + api_mtbs;
+    }
+    */
+}
+
+/*
 void printTickerData(String ticker)
 {
     Serial.println("---------------------------------");
     Serial.println("Getting ticker data for " + ticker);
-
 
     //For the new API, you can use the currency ID or abbreviated name, such as
     //Bitcoin, you can view the letter after Circulating Supply at https://coinmarketcap.com/, it is BTC
@@ -169,8 +201,7 @@ void printTickerData(String ticker)
         tft.fillRect(117, 37, 123, 38, TFT_BLACK); //price
         tft.fillRect(185, 80, 55, 20, TFT_BLACK); //rank
 
-
-            tft.setTextColor(TFT_YELLOW);
+        tft.setTextColor(TFT_YELLOW);
 
         if (response.percent_change_1h < 0) {
             tft.setTextColor(TFT_RED);
@@ -181,7 +212,6 @@ void printTickerData(String ticker)
             tft.setTextColor(TFT_GREEN);
             
         }
-
 
         tft.drawString(String(response.price).c_str(), 100, 37, 6);
         tft.setTextColor(TFT_AQUA);
@@ -205,7 +235,6 @@ void printTickerData(String ticker)
         tft.drawString(String(response.percent_change_1h).c_str(), 156, 110, 4);
         delay(90000);
 
-
         // 24 hours change
         tft.fillRect(100, 110, 140, 25, TFT_BLACK);
         tft.setTextColor(TFT_YELLOW);
@@ -220,7 +249,6 @@ void printTickerData(String ticker)
         tft.drawString(String(response.percent_change_24h).c_str(), 156, 110, 4);
         delay(90000);
 
-
         // 7d hours change
         tft.fillRect(100, 110, 140, 25, TFT_BLACK);
         tft.setTextColor(TFT_YELLOW);
@@ -234,10 +262,7 @@ void printTickerData(String ticker)
         tft.drawString("% Price 7d:", 11, 110, 4);
         tft.drawString(String(response.percent_change_7d).c_str(), 156, 110, 4);
         delay(90000);
-
-
     }
-
     else {
         Serial.print("Error getting data: ");
         Serial.println(response.error);
@@ -245,51 +270,5 @@ void printTickerData(String ticker)
         tft.pushImage(203, 2, alertWidth, alertHeight, alert);
     }
     Serial.println("---------------------------------");
-
-
-
 }
-
-float RSSI = 0.0;
-
-void loop()
-{
-    unsigned long timeNow = millis();
-    if ((timeNow > api_due_time))  {
-        // int signal bars
-        Serial.print("WiFi Signal strength: ");
-        Serial.print(WiFi.RSSI());
-        tft.fillRect(200, 2, 40, 32, TFT_BLACK); //wifi RSSI and alert
-
-
-        int bars;
-        RSSI = WiFi.RSSI();
-
-        if (RSSI >= -55) {
-            bars = 5;
-            Serial.println(" 5 bars");
-        } else if (RSSI < -55 & RSSI >= -65) {
-            bars = 4;
-            Serial.println(" 4 bars");
-        } else if (RSSI < -65 & RSSI >= -70) {
-            bars = 3;
-            Serial.println(" 3 bars");
-        } else if (RSSI < -70 & RSSI >= -78) {
-            bars = 2;
-            Serial.println(" 2 bars");
-        } else if (RSSI < -78 & RSSI >= -82) {
-            bars = 1;
-            Serial.println(" 1 bars");
-        } else {
-            bars = 0;
-            Serial.println(" 0 bars");
-        }
-
-        // signal bars
-        for (int b = 0; b <= bars; b++) {
-            tft.fillRect(202 + (b * 6), 23 - (b * 4), 5, b * 4, TFT_GRAY);
-        }
-        printTickerData("BTC");
-        api_due_time = timeNow + api_mtbs;
-    }
-}
+*/
